@@ -1,10 +1,12 @@
 package org.prime.util
 
+import java.util.*
+
 class Grammar (
     private val terminals: List<String>,
     private val nonTerminals: List<String>,
     private val startTerminal: String,
-    private val productions: List<Production>
+    val productions: List<Production>
         ) {
     override fun toString(): String {
         return """
@@ -26,7 +28,7 @@ Productions: ${productions.toStringSetWithEndLine()}
 }
 
 
-class Production(private val leftSymbols: List<String>, private val rightSymbols: List<String>) {
+data class Production(val leftSymbols: List<String>, val rightSymbols: List<String>) {
 
     override fun toString(): String = "${leftSymbols.toPrettyString()} -> ${rightSymbols.toPrettyString()}"
 
@@ -35,4 +37,14 @@ class Production(private val leftSymbols: List<String>, private val rightSymbols
 
     private fun List<String>.toPrettyString() = toStringNoBrackets().replace(", ", " ")
 
+    fun apply(word: List<String>): List<String>? {
+        val newWord = word.toMutableList()
+        val match = Collections.indexOfSubList(newWord, leftSymbols)
+        if (match == -1) {
+            return null
+        }
+        newWord.subList(match, match + leftSymbols.size).clear()
+        newWord.addAll(match, rightSymbols.filter { it != Constants.EPSILON })
+        return newWord
+    }
 }

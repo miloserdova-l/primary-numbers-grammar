@@ -69,7 +69,7 @@ class ConverterT0 : Converter {
         }
         // (8)
         (sigmaStrings + listOf(Constants.EPSILON)).forEach { a ->
-            sigmaStrings.forEach { C ->
+            gammaStrings.forEach { C ->
                 productions.add(
                     Production(listOf(getBracketSymbol(a, C), acceptStr), listOf(acceptStr, a, acceptStr))
                 )
@@ -81,7 +81,7 @@ class ConverterT0 : Converter {
                 )
             }
         }
-        return Grammar(sigmaStrings, nonTerminals, "A1", productions)
+        return Grammar(sigmaStrings, nonTerminals, "A1", productions.distinct())
     }
 
     private fun getBracketSymbol(left: String, right: String) = "($left|$right)"
