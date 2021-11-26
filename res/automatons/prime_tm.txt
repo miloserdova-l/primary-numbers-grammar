@@ -1,7 +1,7 @@
 init: q00
 accept: finish
 sigma: {1}
-gamma: {_, 2, $, #, .}
+gamma: {_, 2, $, #, ., 1}
 
 // 1. Before entering, we write the symbol # (before # we will write the divisors in the unary number system)
 // 2. We write down the input number with slots and at the end we assign the symbol $ (example: # 111 -> # 1 1 1 $)
