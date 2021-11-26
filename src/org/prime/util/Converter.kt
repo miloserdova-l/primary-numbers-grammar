@@ -1,6 +1,7 @@
 package org.prime.util
 
-import java.io.File
+import org.prime.util.machines.Direction
+import org.prime.util.machines.TapeMachine
 
 interface Converter {
     fun machineToGrammar(machine: TapeMachine): Grammar
@@ -45,7 +46,7 @@ class ConverterT0 : Converter {
         // (5)
         productions.add(Production(listOf("A3"), listOf(Constants.EPSILON)))
 
-        val (deltasLeft, deltasRight) = machine.deltaTransitions.partition {
+        val (deltasRight, deltasLeft) = machine.deltaTransitions.partition {
             it.direction == Direction.RIGHT
         }
         // (6)
