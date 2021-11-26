@@ -1,0 +1,159 @@
+init: q1.0
+accept: qaccept
+sigma: {a}
+gamma: {i, I, c, b}
+
+// Algorithm:
+// n -- input length
+// k -- [i, I] amount
+//
+// 0. Bound markers
+//   1. Place left marker
+//   2. Place right marker
+//   3. Return to the start
+//
+// 1. Set k to 2 (with "I")
+//   1. Placed first I
+//   2. Placed second I
+//   3. Return to the start
+//
+// 2. Dividing loop n by k:
+//   1. Subtraction loop:
+//     1. Decrement k (first I -> i)
+//     2. Right move until meet rest (first b -> c)
+//     3. first a -> b
+//     4. If rightmost symbol in k is "i" (subtraction complete)
+//        then goto 2.2.1
+//     5. Find rightmost "i" (then goto 2.1.1)
+//   2. Check for division:
+//     1. Right move through the "c" ' s
+//     2. Find "b"
+//     3. Left move to the start with reset of k (all i -> I, then goto 2.1.1)
+//
+// 3. Division trash cleaning and k++:
+//   1. Reset (all c -> a; all i -> I)
+//   2. k++ (first a -> I)
+//   3. Return to the start (then goto 2.1.1)
+
+q1.0,#
+q1.0,#,>
+
+q1.0,a
+q1.1,I,>
+
+// if n=1 then abort
+q1.1,#
+qerror,#,<
+
+q1.1,a
+q1.2,I,>
+
+// if n=2 then accept
+q1.2,#
+qaccept,#,<
+
+q1.2,a
+q1.3,a,<
+
+q1.3,I
+q1.3,I,<
+
+q1.3,#
+q2.1.1,#,>
+
+q2.1.1,I
+q2.1.2,i,>
+
+q2.1.2,I
+q2.1.2,I,>
+
+q2.1.2,c
+q2.1.2,c,>
+
+q2.1.2,b
+q2.1.3,c,>
+
+// n is prime
+q2.1.2,#
+qaccept,#,<
+
+q2.1.2,a
+q2.1.4,b,<
+
+q2.1.3,a
+q2.1.4,b,<
+
+q2.1.3,#
+q3.1,#,<
+
+q2.1.4,c
+q2.1.4,c,<
+
+q2.1.4,I
+q2.1.5,I,<
+
+q2.1.5,I
+q2.1.5,I,<
+
+q2.1.5,i
+q2.1.1,i,>
+
+q2.1.4,i
+q2.2.1,i,>
+
+q2.2.1,c
+q2.2.1,c,>
+
+q2.2.1,b
+q2.2.2,b,>
+
+q2.2.2,a
+q2.2.3,a,<
+
+q2.2.3,b
+q2.2.3,b,<
+
+q2.2.3,c
+q2.2.3,c,<
+
+q2.2.3,i
+q2.2.3,I,<
+
+q2.2.3,#
+q2.1.1,#,>
+
+q2.2.2,#
+qerror,#,<
+
+q2.1.3,I
+q2.1.3,I,<
+
+q2.1.3,i
+q2.1.1,i,>
+
+q3.1,c
+q3.1,a,<
+
+q3.1,i
+q3.1,I,<
+
+q3.1,I
+q3.1,I,<
+
+q3.1,a
+q3.1,a,<
+
+q3.1,#
+q3.2,#,>
+
+q3.2,I
+q3.2,I,>
+
+q3.2,a
+q3.3,I,<
+
+q3.3,I
+q3.3,I,<
+
+q3.3,#
+q2.1.1,#,>

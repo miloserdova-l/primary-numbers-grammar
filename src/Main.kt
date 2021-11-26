@@ -1,6 +1,3 @@
-import org.prime.util.ConverterT0
+import org.prime.util.runApp
 
-fun main() {
-    val converter = ConverterT0()
-    val grammarStr = converter.getGrammarFromFileWithAutomaton("res/automatons/prime_tm.txt").toString()
-}
+fun main(args: Array<String>) = runApp(args)
