@@ -16,6 +16,7 @@
 ## Запуск
 #### Неограниченная грамматика
 ```bash
+cd src
 kotlinc $(find . -name "*.kt") -include-runtime -d main.jar
 java -jar main.jar T0
 ```
