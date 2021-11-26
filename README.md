@@ -38,7 +38,7 @@ java -jar main.jar T0
 Последняя строка состоит из терминалов, представляя заданное простое число
 
 #### Пример вывода простого числа 2 из Т0
-```bash
+```
 (epsilon|_), (epsilon|_), (epsilon|_), (epsilon|_), q00, (1|1), (1|1), (epsilon|_), (epsilon|_)
 (epsilon|_), (epsilon|_), (epsilon|_), q01, (epsilon|_), (1|1), (1|1), (epsilon|_), (epsilon|_)
 (epsilon|_), (epsilon|_), (epsilon|_), (epsilon|#), q0, (1|1), (1|1), (epsilon|_), (epsilon|_)
