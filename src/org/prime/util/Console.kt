@@ -12,8 +12,8 @@ const val T0_DERIVATION_PATH = "../res/derivations/T0.txt"
 const val T1_DERIVATION_PATH = "../res/derivations/T1.txt"
 
 fun runApp(args: Array<String>) {
-    if (args.size != 1) return
-    val type = getType(args[0]) ?: return
+    if (args.size != 1) throw AssertionError("Arguments size must be 1!")
+    val type = getType(args[0]) ?: throw AssertionError("Arg must be T0 or T1!")
     val machine = TapeMachine.fromFile(getMachineFilePath(type), type)
     val converter = UtilsFactory.getConverter(type)
     val grammar = converter.machineToGrammar(machine)
@@ -25,7 +25,13 @@ fun runApp(args: Array<String>) {
         if (input == "quit") {
             return
         }
-        val intInput = input.toIntOrNull() ?: continue
+        var intInput: Int
+        try {
+            intInput = input.toIntOrAssertionError()
+        } catch (e: AssertionError) {
+            println(e.message)
+            continue
+        }
         val strInput = "1".repeat(intInput)
         machine.accept(strInput).let {
             when(it) {
@@ -38,13 +44,14 @@ fun runApp(args: Array<String>) {
                         .joinToString(separator = "\n")
                     derivationFile.writeText(derivation)
                     println("Derivation is written in file")
-                    machine.usedDeltas.clear()
                 }
                 false -> println("No, number is not prime")
             }
         }
     }
 }
+
+fun String.toIntOrAssertionError() = toIntOrNull() ?: throw AssertionError("Must be a number!")
 
 
 fun getType(arg: String) = when(arg) {
