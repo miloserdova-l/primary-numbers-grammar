@@ -14,7 +14,7 @@ class TuringMachineReader : MachineReader {
         return fullFillMachine(file, machine)
     }
 }
-
+// As far as I can see, reader are note so much different for tape machines, but I'm not sure
 class LinearBoundedAutomatonReader : MachineReader {
     override fun readMachineFromFile(path: String): TapeMachine {
         val machine = LinearBoundedAutomaton()

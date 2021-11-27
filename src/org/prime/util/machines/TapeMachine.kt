@@ -35,6 +35,9 @@ abstract class TapeMachine {
 
     var sigma: List<String> = ArrayList()
 
+    /**
+     * These are deltas used in processing last word, they are in building derivation tree
+     */
     val usedDeltas: ArrayList<Delta> = ArrayList()
 
     fun addState(state: String): Boolean {
@@ -57,6 +60,7 @@ abstract class TapeMachine {
 
     fun accept(input: String): Boolean {
         currentState = startState
+        usedDeltas.clear()
         val convertedInput = prepareInputForTape(input)
         val control = Control(convertedInput)
         while (currentState != acceptState) {

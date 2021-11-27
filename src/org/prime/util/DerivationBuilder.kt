@@ -7,6 +7,9 @@ interface DerivationBuilder {
     fun buildDerivation(input: List<String>, grammar: Grammar): MutableList<String>
 }
 
+/**
+ * Derivation builder uses TuringMachine to get accumulated used deltas to build derivations
+ */
 class DerivationBuilderT0(private val turingMachine: TuringMachine) : DerivationBuilder {
     override fun buildDerivation(input: List<String>, grammar: Grammar): MutableList<String> {
         var currentWord = mutableListOf(turingMachine.startState)
