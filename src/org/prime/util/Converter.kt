@@ -81,7 +81,7 @@ class ConverterT0 : Converter {
                 )
             }
         }
-        return Grammar(sigmaStrings, nonTerminals, "A1", productions.distinct())
+        return Grammar(sigmaStrings, "A1", productions.distinct())
     }
 
     private fun getBracketSymbol(left: String, right: String) = "($left|$right)"
@@ -90,6 +90,232 @@ class ConverterT0 : Converter {
 
 class ConverterT1 : Converter {
     override fun machineToGrammar(machine: TapeMachine): Grammar {
-        TODO("Not yet implemented")
+        val sigmaStrings = machine.sigma
+        val initStr = machine.startState
+        val gammaStrings = machine.gamma
+        val acceptStr = machine.acceptState
+        val productions = ArrayList<Production>()
+
+
+        for (sigma in sigmaStrings) {
+            productions.add(Production(listOf("A1"), listOf("($initStr|_|$sigma|$sigma|_)")))
+            productions.add(Production(listOf("A1"), listOf("($initStr|_|$sigma|$sigma)", "A2")))
+            productions.add(Production(listOf("A2"), listOf("($sigma|$sigma)", "A2")))
+            productions.add(Production(listOf("A2"), listOf("($sigma|$sigma|_)")))
+        }
+
+
+        for (delta in machine.deltaTransitions) {
+            for (sigma in sigmaStrings) {
+                if (delta.direction == Direction.RIGHT) {
+                    if (delta.readSymbol == "_") {
+                        for (e in gammaStrings) {
+
+                            productions.add(
+                                Production(
+                                    listOf("(" + delta.currentState + "|_|" + e + "|" + sigma + "|_)"),
+                                    listOf("(_|" + delta.nextState + "|" + e + "|" + sigma + "|_)")
+                                )
+                            )
+                        }
+                    } else {
+
+                        productions.add(
+                            Production(
+                                listOf("(_|" + delta.currentState + "|" + delta.readSymbol + "|" + sigma + "|_)"),
+                                listOf("(_|" + delta.writeSymbol + "|" + sigma + "|" + delta.nextState + "|_)")
+                            )
+                        )
+                    }
+                } else {
+                    if (delta.readSymbol == "_") {
+                        for (gamma in gammaStrings) {
+                            productions.add(
+                                Production(
+                                    listOf("(_|" + gamma + "|" + sigma + "|" + delta.currentState + "|_)"),
+                                    listOf("(_|" + delta.nextState + "|" + gamma + "|" + sigma + "|_)")
+                                )
+                            )
+                        }
+                    } else {
+                        productions.add(
+                            Production(
+                                listOf("(_|" + delta.currentState + "|" + delta.readSymbol + "|" + sigma + "|_)"),
+                                listOf("(" + delta.nextState + "|_|" + delta.writeSymbol + "|" + sigma + "|_)")
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+
+        for (sigma in sigmaStrings) {
+            for (gamma in gammaStrings) {
+                productions.add(Production(listOf("($acceptStr|_|$gamma|$sigma|_)"), listOf(sigma)))
+                productions.add(Production(listOf("(_|$acceptStr|$gamma|$sigma|_)"), listOf(sigma)))
+                productions.add(Production(listOf("(_|$gamma|$sigma|$acceptStr|_)"), listOf(sigma)))
+            }
+        }
+
+
+
+        for (delta in machine.deltaTransitions) {
+            for (sigma in sigmaStrings) {
+                if (delta.direction == Direction.RIGHT) {
+                    if (delta.readSymbol == "_") {
+                        for (gamma in gammaStrings) {
+                            productions.add(
+                                Production(
+                                    listOf("(" + delta.currentState + "|_|" + gamma + "|" + sigma + ")"),
+                                    listOf("(_|" + delta.nextState + "|" + gamma + "|" + sigma + ")")
+                                )
+                            )
+                        }
+                    } else {
+                        for (gamma in gammaStrings) {
+                            for (s1 in sigmaStrings) {
+                                productions.add(
+                                    Production(
+                                        listOf("(_|" + delta.currentState + "|" + delta.readSymbol + "|" + sigma + ")", "($gamma|$s1)"),
+                                        listOf("(_|" + delta.writeSymbol + "|" + sigma + ")", "(" + delta.nextState + "|" + gamma + "|" + s1 + ")")
+                                    )
+                                )
+                                productions.add(
+                                    Production(
+                                        listOf("(_|" + delta.currentState + "|" + delta.readSymbol + "|" + sigma + ")", "($gamma|$s1|_)"),
+                                        listOf("(_|" + delta.writeSymbol + "|" + sigma + ")", "(" + delta.nextState + "|" + gamma + "|" + s1 + "_)")
+                                    )
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    productions.add(
+                        Production(
+                            listOf("(_|" + delta.currentState + "|" + delta.readSymbol + "|" + sigma + ")"),
+                            listOf("(" + delta.nextState + "|_|" + delta.writeSymbol + "|" + sigma + ")")
+                        )
+                    )
+                }
+            }
+        }
+
+
+        for (delta in machine.deltaTransitions) {
+            for (s1 in sigmaStrings) {
+                for (s2 in sigmaStrings) {
+                    if (delta.direction == Direction.RIGHT) {
+                        for (gamma in gammaStrings) {
+                            productions.add(
+                                Production(
+                                    listOf("(" + delta.currentState + "|" + delta.readSymbol + "|" + s1 + ")", "($gamma|$s2)"),
+                                    listOf("(" + delta.writeSymbol + "|" + s1 + ")", "(" + delta.nextState + "|" + gamma + "|" + s2 + ")")
+                                )
+                            )
+                            productions.add(
+                                Production(
+                                    listOf("(" + delta.currentState + "|" + delta.readSymbol + "|" + s1 + ")", "($gamma|$s2|_)"),
+                                    listOf("(" + delta.writeSymbol + "|" + s1 + ")", "(" + delta.nextState + "|" + gamma + "|" + s2 + "|_)")
+                                )
+                            )
+                        }
+                    } else {
+                        for (gamma in gammaStrings) {
+                            productions.add(
+                                Production(
+                                    listOf("($gamma|$s2)", "(" + delta.currentState + "|" + delta.readSymbol + "|" + s1 + ")"),
+                                    listOf("(" + delta.nextState + "|" + gamma + "|" + s2 + ")", "(" + delta.writeSymbol + "|" + s1 + ")")
+                                )
+                            )
+                            productions.add(
+                                Production(
+                                    listOf("(_|$gamma|$s2)", "(" + delta.currentState + "|" + delta.readSymbol + "|" + s1 + ")"),
+                                    listOf("(_|" + delta.nextState + "|" + gamma + "|" + s2 + ")", "(" + delta.writeSymbol + "|" + s1 + ")")
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+
+        for (delta in machine.deltaTransitions) {
+            for (sigma in sigmaStrings) {
+                if (delta.direction == Direction.RIGHT) {
+                    productions.add(
+                        Production(
+                            listOf("(" + delta.currentState + "|" + delta.readSymbol + "|" + sigma + "|_)"),
+                            listOf("(" + delta.writeSymbol + "|" + sigma + "|" + delta.nextState + "|_)")
+                        )
+                    )
+                } else {
+                    if (delta.readSymbol == "_") {
+                        for (gamma in gammaStrings) {
+                            productions.add(
+                                Production(
+                                    listOf("(" + gamma + "|" + sigma + "|" + delta.currentState + "|_)"),
+                                    listOf("(" + delta.nextState + "|" + gamma + "|" + sigma + "|_)")
+                                )
+                            )
+                        }
+                    } else {
+                        for (gamma in gammaStrings) {
+                            for (s1 in sigmaStrings) {
+                                productions.add(
+                                    Production(
+                                        listOf("(" + gamma + "|" + s1 + ")",  "(" + delta.currentState + "|" + delta.readSymbol + "|" + sigma + "|_)"),
+                                        listOf("(" + delta.nextState + "|" + gamma + "|" + s1 + "_)", "(" + delta.writeSymbol + "|" + sigma + "|_)")
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        for (sigma in sigmaStrings) {
+            for (gamma in gammaStrings) {
+                productions.add(
+                    Production(listOf("(" + acceptStr + "|_|" + gamma + "|" + sigma + ")"), listOf(sigma))
+                )
+                productions.add(
+                    Production(listOf("(_|" + acceptStr + "|" + gamma + "|" + sigma + ")"), listOf(sigma))
+                )
+                productions.add(
+                    Production(listOf("(" + acceptStr + "|" + gamma + "|" + sigma + ")"), listOf(sigma))
+                )
+                productions.add(
+                    Production(listOf("(" + acceptStr + "|" + gamma + "|" + sigma + "|_)"), listOf(sigma))
+                )
+                productions.add(
+                    Production(listOf("(" + gamma + "|" + sigma + "|" + acceptStr + "|_)"), listOf(sigma))
+                )
+            }
+        }
+
+
+        for (s1 in sigmaStrings) {
+            for (s2 in sigmaStrings) {
+                for (gamma in gammaStrings) {
+                    productions.add(
+                        Production(listOf(s1, "(" + gamma + "|" + s2 + ")"), listOf(s1, s2))
+                    )
+                    productions.add(
+                        Production(listOf(s1, "(" + gamma + "|" + s2 + "|_)"), listOf(s1, s2))
+                    )
+                    productions.add(
+                        Production(listOf("(" + gamma + "|" + s1 + ")", s2), listOf(s1, s2))
+                    )
+                    productions.add(
+                        Production(listOf("(_|" + gamma + "|" + s1 + ")", s2), listOf(s1, s2))
+                    )
+                }
+            }
+        }
+        return Grammar(sigmaStrings,"A1", productions.distinct())
     }
 }

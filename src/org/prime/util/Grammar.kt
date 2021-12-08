@@ -4,14 +4,12 @@ import java.util.*
 
 class Grammar (
     private val terminals: List<String>,
-    private val nonTerminals: List<String>,
     private val startTerminal: String,
     val productions: List<Production>
         ) {
     override fun toString(): String {
         return """
 Terminals: ${terminals.toStringSet()};
-NonTerminals: ${nonTerminals.toStringSet()};
 Start Terminal: $startTerminal;
 Productions: ${productions.toStringSetWithEndLine()}
 """.trimIndent()
